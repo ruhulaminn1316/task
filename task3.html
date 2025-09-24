@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upcoming Contests</title>
+<style>
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    color: #007bff;
+  }
+
+  .contest-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .contest-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+
+  .contest-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,123,255,0.3);
+  }
+
+  .contest-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #007bff;
+  }
+
+  .contest-card p {
+    margin: 5px 0;
+    color: #333;
+  }
+
+  .contest-card button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.3s;
+  }
+
+  .contest-card button:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+  }
+
+  .section-title {
+    margin-top: 40px;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  @media(max-width: 500px) {
+    h1 { font-size: 1.5rem; }
+    .contest-card { padding: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Upcoming Contests</h1>
+<div class="contest-container" id="upcoming"></div>
+
+<div class="section-title">Past 5 Contests</div>
+<div class="contest-container" id="past"></div>
+
+<script>
+const upcomingDiv = document.getElementById("upcoming");
+const pastDiv = document.getElementById("past");
+
+async function fetchContests() {
+  try {
+    const res = await fetch("https://codeforces.com/api/contest.list?gym=false");
+    const data = await res.json();
+    const contests = data.result;
+
+    const now = Date.now()/1000;
+
+    // Upcoming contests
+    const upcoming = contests.filter(c => c.phase === "BEFORE").slice(0, 10);
+    upcoming.forEach((c, idx) => {
+      const card = document.createElement("div");
+      card.classList.add("contest-card");
+
+      const startTime = new Date(c.startTimeSeconds * 1000);
+      const durationH = Math.floor(c.durationSeconds / 3600);
+      const durationM = Math.floor((c.durationSeconds % 3600)/60);
+
+      card.innerHTML = `
+        <h2>${idx+1}. ${c.name}</h2>
+        <p>Start: ${startTime.toLocaleString()}</p>
+        <p>Duration: ${durationH} h ${durationM} m</p>
+        <p id="countdown-${c.id}">Countdown: calculating...</p>
+        <button onclick="setReminder('${c.name}', ${c.startTimeSeconds})">Set Reminder</button>
+      `;
+      upcomingDiv.appendChild(card);
+
+      startCountdown(c.id, c.startTimeSeconds);
+    });
+
+    // Past 5 contests
+    const past = contests.filter(c => c.phase === "FINISHED").slice(0, 5);
+    past.forEach(c => {
+      const card = document.createElement("div");
+      card.classList.add("contest-card");
+      card.innerHTML = `<h2>${c.name}</h2><p>Finished on: ${new Date(c.startTimeSeconds*1000).toLocaleDateString()}</p>`;
+      pastDiv.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+    upcomingDiv.textContent = "Failed to fetch contests.";
+  }
+}
+
+// Countdown function
+function startCountdown(id, startSec) {
+  const span = document.getElementById(`countdown-${id}`);
+  function update() {
+    const now = Date.now()/1000;
+    let diff = startSec - now;
+    if(diff <= 0) {
+      span.textContent = "Contest Started!";
+      clearInterval(interval);
+      return;
+    }
+    const d = Math.floor(diff / 86400);
+    diff %= 86400;
+    const h = Math.floor(diff / 3600);
+    diff %= 3600;
+    const m = Math.floor(diff / 60);
+    const s = Math.floor(diff % 60);
+    span.textContent = `Countdown: ${d}d ${h}h ${m}m ${s}s`;
+  }
+  update();
+  const interval = setInterval(update, 1000);
+}
+
+// Set Reminder using browser notification
+function setReminder(name, startSec) {
+  if(!("Notification" in window)) {
+    alert("This browser does not support notifications.");
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if(permission === "granted") {
+      const now = Date.now();
+      const delay = startSec*1000 - now;
+      if(delay <= 0) {
+        alert("Contest already started!");
+        return;
+      }
+      setTimeout(() => {
+        new Notification(`Codeforces Contest Reminder`, {
+          body: `${name} is starting now!`,
+        });
+      }, delay);
+      alert("Reminder set!");
+    }
+  });
+}
+
+fetchContests();
+</script>
+
+</body>
+</html>
