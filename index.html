@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Info Card</title>
+  <style>
+    /* ==== Base Styles ==== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      transition: background 0.4s ease;
+    }
+
+    /* ==== Card ==== */
+    .card {
+      width: 90%;
+      max-width: 370px;
+      background: linear-gradient(135deg, #ffffff, #f5faff);
+      padding: 28px;
+      border-radius: 22px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: all 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: radial-gradient(circle, rgba(0,123,255,0.25) 0%, transparent 75%);
+      transform: scale(0);
+      transition: transform 0.6s ease;
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    .card:hover::before {
+      transform: scale(1);
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.06) rotateX(4deg) rotateY(4deg);
+      box-shadow: 0 25px 55px rgba(0, 123, 255, 0.35), 0 10px 20px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(0, 123, 255, 0.6);
+      background: linear-gradient(135deg, #ffffff, #eaf3ff);
+    }
+
+    .card h2,
+    .card p {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: #333;
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .card p {
+      font-size: 1rem;
+      margin: 8px 0;
+      color: #555;
+    }
+
+    /* ==== Dark Mode ==== */
+    body.dark-mode {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+
+    .dark-mode .card {
+      background: linear-gradient(135deg, #1a1a1a, #222831);
+      color: #f5f5f5;
+      box-shadow: 0 12px 25px rgba(0, 200, 255, 0.2);
+      border: 1px solid #333;
+    }
+
+    .dark-mode .card:hover {
+      border: 2px solid rgba(0, 200, 255, 0.8);
+      box-shadow: 0 28px 55px rgba(0, 200, 255, 0.35), 0 12px 25px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(135deg, #1f1f1f, #2b2b2b);
+    }
+
+    .dark-mode .card p {
+      color: #ddd;
+    }
+
+    .dark-mode .card h2 {
+      background: linear-gradient(to right, #00c6ff, #007bff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ==== Button ==== */
+    .toggle-btn {
+      margin-top: 18px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.4s;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .toggle-btn:hover {
+      background: linear-gradient(135deg, #0056b3, #0090cc);
+      transform: scale(1.07);
+      box-shadow: 0 10px 20px rgba(0, 123, 255, 0.4);
+    }
+
+    /* ==== Responsive ==== */
+    @media (max-width: 500px) {
+      .card {
+        padding: 22px;
+        border-radius: 18px;
+      }
+      .card h2 {
+        font-size: 1.5rem;
+      }
+      .card p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Ruhul Amin</h2>
+    <p>🎓 University: Green University of Bangladesh</p>
+    <p>💻 Favorite Language: JavaScript</p>
+    <button class="toggle-btn" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+  </script>
+</body>
+</html>
